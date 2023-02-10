@@ -93,7 +93,7 @@ namespace Tests
             }
 
             [Fact]
-            public void ParseArguments_WithExpectedParamsOneWithMoreThanOneWord_ThrowsExpectedException()
+            public void ParseArguments_WithExpectedParamsOneWithMoreThanOneWord_ReturnsExpectedResult()
             {
                 // Arrange
                 string[] args = new string[] { "-Username", "john", "--Super-Secret-Password", "secret" };
@@ -108,7 +108,7 @@ namespace Tests
             }
 
             [Fact]
-            public void ParseArguments_WithExpectedParamsTwoWithMissmachingSeparator_ThrowsExpectedException()
+            public void ParseArguments_WithExpectedParamsTwoWithMissmachingSeparator_ReturnsExpectedResult()
             {
                 // Arrange
                 string[] args = new string[] { "-Username", "john", "--Super-Secret-Password", "secret" };
@@ -148,6 +148,47 @@ namespace Tests
                 // Assert
                 Assert.False(((IDictionary<String, object>)result).ContainsKey("Username"));
                 Assert.False(((IDictionary<String, object>)result).ContainsKey("Password"));
+            }
+
+            [Fact]
+            public void ParseArguments_NumericArgs_ReturnsExpectedResult()
+            {
+                // Arrange
+                string[] args = new string[] { "-Username", "12345", "-Password", "12345" };
+
+                // Act
+                dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
+
+                // Assert
+                Assert.IsType<String>(result.Username);
+                Assert.IsType<String>(result.Password);
+            }
+
+            [Fact]
+            public void ParseArguments_DateArgs_ReturnsExpectedResult()
+            {
+                // Arrange
+                string[] args = new string[] { "-Username", "'11/11/2011'", "-Password", "`16:00:32 12.12.2012`" };
+
+                // Act
+                dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
+
+                // Assert
+                Assert.IsType<String>(result.Username);
+                Assert.IsType<String>(result.Password);
+            }
+
+            public void ParseArguments_DateArgWithoutQuotes_ThrowsExpectedException()
+            {
+                // Arrange
+                string[] args = new string[] { "-Username", "11/11/2011", "-Password", "`16:00:32 12.12.2012`" };
+
+                // Act
+                Action act = () => ArgsParser.ArgsParser.ParseArguments(args);
+                ArgumentException exception = Assert.Throws<ArgumentException>(act);
+
+                // Assert
+                Assert.Equal("Incorrect arguments format!", exception.Message);
             }
         }
     }
