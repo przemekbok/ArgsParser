@@ -42,8 +42,8 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
 
                 // Assert
-                Assert.Equal("'john'", result.Username);
-                Assert.Equal("'secret'", result.SuperSecretPassword);
+                Assert.Equal("john", result.Username);
+                Assert.Equal("secret", result.SuperSecretPassword);
             }
 
             [Fact]
@@ -57,8 +57,8 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
 
                 // Assert
-                Assert.Equal("'john'", result.Username);
-                Assert.Equal("'secret'", result.Password);
+                Assert.Equal("john", result.Username);
+                Assert.Equal("secret", result.Password);
             }
 
             [Fact]
@@ -72,9 +72,24 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
 
                 // Assert
-                Assert.Equal("'john'", result.Username);
-                Assert.Equal("'secret'", result.Password);
+                Assert.Equal("john", result.Username);
+                Assert.Equal("secret", result.Password);
                 Assert.True(((IDictionary<String, object>)result).ContainsKey("Age"));
+            }
+
+            [Fact]
+            public void ParseArguments_WithOneMissingAndOneUnexpectedParam_ThrowsExpectedException()
+            {
+                // Arrange
+                string[] args = new string[] { "-Username", "'john'", "-Age", "30" };
+                List<string> expectedParams = new List<string> { "-Username", "-Password" };
+
+                // Act
+                Action act = () => ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
+                ArgumentException exception = Assert.Throws<ArgumentException>(act);
+
+                // Assert
+                Assert.Equal($"Argument Password is missing!", exception.Message);
             }
 
             [Fact]
@@ -103,8 +118,8 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
 
                 // Assert
-                Assert.Equal("'john'", result.Username);
-                Assert.Equal("'secret'", result.SuperSecretPassword);
+                Assert.Equal("john", result.Username);
+                Assert.Equal("secret", result.SuperSecretPassword);
             }
 
             [Fact]
@@ -118,8 +133,8 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
 
                 // Assert
-                Assert.Equal("'john'", result.Username);
-                Assert.Equal("'secret'", result.SuperSecretPassword);
+                Assert.Equal("john", result.Username);
+                Assert.Equal("secret", result.SuperSecretPassword);
             }
 
             [Fact]
@@ -132,8 +147,8 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
 
                 // Assert
-                Assert.Equal("'john'", result.Username);
-                Assert.Equal("'secret'", result.Password);
+                Assert.Equal("john", result.Username);
+                Assert.Equal("secret", result.Password);
             }
 
             [Fact]
@@ -160,8 +175,8 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
 
                 // Assert
-                Assert.IsType<String>(result.Username);
-                Assert.IsType<String>(result.Password);
+                Assert.Equal("12345", result.Username);
+                Assert.Equal("12345", result.Password);
             }
 
             [Fact]
@@ -174,8 +189,8 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
 
                 // Assert
-                Assert.IsType<String>(result.Username);
-                Assert.IsType<String>(result.Password);
+                Assert.Equal("12345.123", result.Username);
+                Assert.Equal("12345.123", result.Password);
             }
 
             [Fact]
@@ -192,6 +207,32 @@ namespace Tests
                 Assert.Equal("Incorrect arguments format!", exception.Message);
             }
 
+            [Fact]
+            public void ParseArguments_EmptyArgs_ReturnsExpectedResult()
+            {
+                // Arrange
+                string[] args = new string[] { "-Username", "''", "-Password", "''" };
+
+                // Act
+                dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
+
+                // Assert
+                Assert.Equal("", result.Username);
+                Assert.Equal("", result.Password);
+            }
+
+            [Fact]
+            public void ParseArguments_SameArgs_ReturnsExpectedResult()
+            {
+                // Arrange
+                string[] args = new string[] { "-Username", "'john'", "-Username", "'secret'" };
+
+                // Act
+                dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
+
+                // Assert
+                Assert.Equal("secret", result.Username);
+            }
 
             [Fact]
             public void ParseArguments_DateArgs_ReturnsExpectedResult()
@@ -203,8 +244,9 @@ namespace Tests
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
 
                 // Assert
-                Assert.IsType<String>(result.Username);
-                Assert.IsType<String>(result.Password);
+                // Assert
+                Assert.Equal("11/11/2011", result.Username);
+                Assert.Equal("16:00:32 12.12.2012", result.Password);
             }
 
             [Fact]

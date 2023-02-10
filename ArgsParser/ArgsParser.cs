@@ -7,7 +7,7 @@ namespace ArgsParser
     {
         public static dynamic ParseArguments(string[] args, List<string> expectedParams = null)
         {
-            Regex argumentStringValidator = new Regex(@"^(((-\w+)|(-{2}\w+(-\w+)+))\s+((\d+(\.\d+)?)|(""[^""]+"")|(\'[^\']+\')|(\`[^\`]+\`))\s*)*$");
+            Regex argumentStringValidator = new Regex(@"^(((-\w+)|(-{2}\w+(-\w+)+))\s+((\d+(\.\d+)?)|(""[^""]*"")|(\'[^\']*\')|(\`[^\`]*\`))\s*)*$");
             var argsAsAString = String.Join(" ", args);
             if(!argumentStringValidator.IsMatch(argsAsAString)) throw new ArgumentException("Incorrect arguments format!");
 
@@ -19,18 +19,19 @@ namespace ArgsParser
 
             for (int i = 0; i < args.Length; i += 2)
             {
-                if (i + 1 < args.Length)
-                {
-                    string key = args[i];
-                    key = key.Replace("-", String.Empty);
-                    string value = args[i + 1];
+                string key = args[i];
+                key = key.Replace("-", String.Empty);
+                string value = args[i + 1];
+                value = value.Trim('"');
+                value = value.Trim('\'');
+                value = value.Trim('`');
 
-                    dict[key] = value;
-                }
+                dict[key] = value;
             }
 
             var argumentDiff = expectedParams.Except(dict.Keys).ToList();
-            if (argumentDiff.Count() > 0) throw new ArgumentException($"Arguments {String.Join(" and ", argumentDiff)} are missing!");
+            if (argumentDiff.Count() == 1) throw new ArgumentException($"Argument {argumentDiff.First()} is missing!");
+            if (argumentDiff.Count() > 1) throw new ArgumentException($"Arguments {String.Join(" and ", argumentDiff)} are missing!");
 
             return result;
         }
