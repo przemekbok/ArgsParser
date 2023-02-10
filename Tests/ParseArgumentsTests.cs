@@ -8,7 +8,7 @@ namespace Tests
             public void ParseArguments_WrongArgumentsFormat_ThrowsExpectedException()
             {
                 //Arrange
-                string[] args = new string[] { "-Username", "john", "Password", "secret"};
+                string[] args = new string[] { "-Username", "'john'", "Password", "'secret'" };
 
                 //Act
                 Action act = () => ArgsParser.ArgsParser.ParseArguments(args);
@@ -22,7 +22,7 @@ namespace Tests
             public void ParseArguments_MissingDashSignOnArgumentWithMoreThaOneWord_ThrowsExpectedException()
             {
                 //Arrange
-                string[] args = new string[] { "-Username", "john", "-Super-Secret-Password", "secret" };
+                string[] args = new string[] { "-Username", "'john'", "-Super-Secret-Password", "'secret'" };
 
                 //Act
                 Action act = () => ArgsParser.ArgsParser.ParseArguments(args);
@@ -36,44 +36,44 @@ namespace Tests
             public void ParseArguments_ArgumentWithMoreThanOneWord_ReturnsExpectedResult()
             {
                 // Arrange
-                string[] args = new string[] { "-Username", "john", "--Super-Secret-Password", "secret" };
+                string[] args = new string[] { "-Username", "'john'", "--Super-Secret-Password", "'secret'" };
 
                 // Act
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
 
                 // Assert
-                Assert.Equal("john", result.Username);
-                Assert.Equal("secret", result.SuperSecretPassword);
+                Assert.Equal("'john'", result.Username);
+                Assert.Equal("'secret'", result.SuperSecretPassword);
             }
 
             [Fact]
             public void ParseArguments_WithExpectedParams_ReturnsExpectedResult()
             {
                 // Arrange
-                string[] args = new string[] { "-Username", "john", "-Password", "secret" };
+                string[] args = new string[] { "-Username", "'john'", "-Password", "'secret'" };
                 List<string> expectedParams = new List<string> { "Username", "Password" };
 
                 // Act
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
 
                 // Assert
-                Assert.Equal("john", result.Username);
-                Assert.Equal("secret", result.Password);
+                Assert.Equal("'john'", result.Username);
+                Assert.Equal("'secret'", result.Password);
             }
 
             [Fact]
             public void ParseArguments_WithUnexpectedParam_ReturnsExpectedResult()
             {
                 // Arrange
-                string[] args = new string[] { "-Username", "john", "-Password", "secret", "-Age", "30" };
+                string[] args = new string[] { "-Username", "'john'", "-Password", "'secret'", "-Age", "30" };
                 List<string> expectedParams = new List<string> { "-Username", "-Password" };
 
                 // Act
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
 
                 // Assert
-                Assert.Equal("john", result.Username);
-                Assert.Equal("secret", result.Password);
+                Assert.Equal("'john'", result.Username);
+                Assert.Equal("'secret'", result.Password);
                 Assert.True(((IDictionary<String, object>)result).ContainsKey("Age"));
             }
 
@@ -96,44 +96,44 @@ namespace Tests
             public void ParseArguments_WithExpectedParamsOneWithMoreThanOneWord_ReturnsExpectedResult()
             {
                 // Arrange
-                string[] args = new string[] { "-Username", "john", "--Super-Secret-Password", "secret" };
+                string[] args = new string[] { "-Username", "'john'", "--Super-Secret-Password", "'secret'" };
                 List<string> expectedParams = new List<string> { "-Username", "--Super-Secret-Password" };
 
                 // Act
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
 
                 // Assert
-                Assert.Equal("john", result.Username);
-                Assert.Equal("secret", result.SuperSecretPassword);
+                Assert.Equal("'john'", result.Username);
+                Assert.Equal("'secret'", result.SuperSecretPassword);
             }
 
             [Fact]
             public void ParseArguments_WithExpectedParamsTwoWithMissmachingSeparator_ReturnsExpectedResult()
             {
                 // Arrange
-                string[] args = new string[] { "-Username", "john", "--Super-Secret-Password", "secret" };
+                string[] args = new string[] { "-Username", "'john'", "--Super-Secret-Password", "'secret'" };
                 List<string> expectedParams = new List<string> { "Username", "-Super-Secret-Password" };
 
                 // Act
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args, expectedParams);
 
                 // Assert
-                Assert.Equal("john", result.Username);
-                Assert.Equal("secret", result.SuperSecretPassword);
+                Assert.Equal("'john'", result.Username);
+                Assert.Equal("'secret'", result.SuperSecretPassword);
             }
 
             [Fact]
             public void ParseArguments_WithNoExpectedParams_ReturnsExpectedResult()
             {
                 // Arrange
-                string[] args = new string[] { "-Username", "john", "-Password", "secret" };
+                string[] args = new string[] { "-Username", "'john'", "-Password", "'secret'" };
 
                 // Act
                 dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
 
                 // Assert
-                Assert.Equal("john", result.Username);
-                Assert.Equal("secret", result.Password);
+                Assert.Equal("'john'", result.Username);
+                Assert.Equal("'secret'", result.Password);
             }
 
             [Fact]
@@ -151,7 +151,7 @@ namespace Tests
             }
 
             [Fact]
-            public void ParseArguments_NumericArgs_ReturnsExpectedResult()
+            public void ParseArguments_IntegerArgs_ReturnsExpectedResult()
             {
                 // Arrange
                 string[] args = new string[] { "-Username", "12345", "-Password", "12345" };
@@ -163,6 +163,35 @@ namespace Tests
                 Assert.IsType<String>(result.Username);
                 Assert.IsType<String>(result.Password);
             }
+
+            [Fact]
+            public void ParseArguments_DoubleArgs_ReturnsExpectedResult()
+            {
+                // Arrange
+                string[] args = new string[] { "-Username", "12345.123", "-Password", "12345.123" };
+
+                // Act
+                dynamic result = ArgsParser.ArgsParser.ParseArguments(args);
+
+                // Assert
+                Assert.IsType<String>(result.Username);
+                Assert.IsType<String>(result.Password);
+            }
+
+            [Fact]
+            public void ParseArguments_DoubleArgMissingDecimalPart_ThrowsExpectedException()
+            {
+                // Arrange
+                string[] args = new string[] { "-Username", "12345." };
+
+                // Act
+                Action act = () => ArgsParser.ArgsParser.ParseArguments(args);
+                ArgumentException exception = Assert.Throws<ArgumentException>(act);
+
+                // Assert
+                Assert.Equal("Incorrect arguments format!", exception.Message);
+            }
+
 
             [Fact]
             public void ParseArguments_DateArgs_ReturnsExpectedResult()
@@ -178,6 +207,7 @@ namespace Tests
                 Assert.IsType<String>(result.Password);
             }
 
+            [Fact]
             public void ParseArguments_DateArgWithoutQuotes_ThrowsExpectedException()
             {
                 // Arrange

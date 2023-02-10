@@ -7,7 +7,7 @@ namespace ArgsParser
     {
         public static dynamic ParseArguments(string[] args, List<string> expectedParams = null)
         {
-            Regex argumentStringValidator = new Regex(@"^(((-\w+)|(-{2}\w+(-\w+)+))\s+((\w+)|("".+\"")|('.+')|(`.+`))\s*)*$");
+            Regex argumentStringValidator = new Regex(@"^(((-\w+)|(-{2}\w+(-\w+)+))\s+((\d+(\.\d+)?)|(""[^""]+"")|(\'[^\']+\')|(\`[^\`]+\`))\s*)*$");
             var argsAsAString = String.Join(" ", args);
             if(!argumentStringValidator.IsMatch(argsAsAString)) throw new ArgumentException("Incorrect arguments format!");
 
