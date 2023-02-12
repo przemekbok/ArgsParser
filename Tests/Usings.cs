@@ -2,3 +2,8 @@ global using System.Collections.Generic;
 global using System.Dynamic;
 global using Xunit;
 global using ArgsParser;
+global using ArgsParser.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.DependencyInjection;
+global using Tests.Mock;
+global using Tests.Helpers.DependencyInjection;
