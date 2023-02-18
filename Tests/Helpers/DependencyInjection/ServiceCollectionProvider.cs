@@ -8,14 +8,16 @@ namespace Tests.Helpers.DependencyInjection
 {
     public class ServiceCollectionProvider
     {
-        private IServiceCollection Services { get; set; }
-
-        public ServiceCollectionProvider()
+        private HostBuilderContext HostBuilder;
+        private IServiceCollection Services;
+        
+        public ServiceCollectionProvider(string[] args)
         {
             Host
-                .CreateDefaultBuilder(new string[0])
-                .ConfigureServices(services =>
+                .CreateDefaultBuilder(args)
+                .ConfigureServices((hostBuilder,services) =>
                 {
+                    HostBuilder = hostBuilder;
                     Services = services;
                 })
                 .Build();
@@ -25,6 +27,11 @@ namespace Tests.Helpers.DependencyInjection
         {
             Services.Clear();
             return Services;
+        }
+
+        public HostBuilderContext GetHostBuilder()
+        {
+            return HostBuilder;
         }
     }
 }
