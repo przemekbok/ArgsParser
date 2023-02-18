@@ -13,11 +13,11 @@ namespace ArgsParser.DependencyInjection
 {
     public static class ServiceCollection
     {
-        private static string[] GetArgsFromHostBuilder(HostBuilderContext hostBuilder)
+        private static string[]? GetArgsFromHostBuilder(HostBuilderContext hostBuilder)
         {
             var configuration = hostBuilder.Configuration;
 
-            var providers = (configuration as ConfigurationRoot).Providers;
+            var providers = ((ConfigurationRoot)configuration).Providers;
             var cmdLineConfigProv = providers.Where(provider => provider.GetType() == typeof(CommandLineConfigurationProvider)).First() as CommandLineConfigurationProvider;
             var args = typeof(CommandLineConfigurationProvider).GetProperty("Args", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(cmdLineConfigProv) as string[];
 
@@ -34,7 +34,7 @@ namespace ArgsParser.DependencyInjection
         public static IServiceCollection AddConsoleArgumentsConfig<T>(this IServiceCollection services, HostBuilderContext hostBuilder) where T : class
         {
             var args = GetArgsFromHostBuilder(hostBuilder);
-            return services.AddConsoleArgumentsConfig<T>(args);
+            return services.AddConsoleArgumentsConfig<T>(args ?? new string[0]);
         }
 
         public static IServiceCollection AddConsoleArgumentsDynamicConfig(this IServiceCollection services, string[] args, List<string> expectedParams = null)

@@ -6,7 +6,7 @@ namespace Tests
     {
         public class AddConsoleArgumentsObjectTests
         {
-            private ServiceCollectionProvider serviceCollectionProvider = new ServiceCollectionProvider(new string[] { "-Username", "'john'", "-Password", "'secret'" });
+            private ServiceCollectionProvider serviceCollectionProvider = new ServiceCollectionProvider();
 
             [Fact]
             public void AddConsoleArgumentsObjectTests_HostBuilderAsAnArgument_ReturnsExpectedResult()
@@ -16,7 +16,7 @@ namespace Tests
 
                 //Act
                 var services = serviceCollectionProvider.GetServices();
-                var hostBuilder = serviceCollectionProvider.GetHostBuilder();
+                var hostBuilder = serviceCollectionProvider.GetHostBuilderWithArgs(args);
                 services.AddConsoleArgumentsConfig<MockSimpleConsoleArgumentsClass>(hostBuilder);
                 MockSimpleConsoleArgumentsClass? result = services.BuildServiceProvider().GetService(typeof(MockSimpleConsoleArgumentsClass)) as MockSimpleConsoleArgumentsClass;
 

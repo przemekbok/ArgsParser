@@ -11,10 +11,10 @@ namespace Tests.Helpers.DependencyInjection
         private HostBuilderContext HostBuilder;
         private IServiceCollection Services;
         
-        public ServiceCollectionProvider(string[] args)
+        public ServiceCollectionProvider()
         {
             Host
-                .CreateDefaultBuilder(args)
+                .CreateDefaultBuilder(new string[0])
                 .ConfigureServices((hostBuilder,services) =>
                 {
                     HostBuilder = hostBuilder;
@@ -27,6 +27,21 @@ namespace Tests.Helpers.DependencyInjection
         {
             Services.Clear();
             return Services;
+        }
+
+        public HostBuilderContext GetHostBuilderWithArgs(string[] args)
+        {
+            var hostBuilderWithArgs = HostBuilder;
+
+            Host
+            .CreateDefaultBuilder(args)
+            .ConfigureServices((hostBuilder, services) =>
+            {
+                hostBuilderWithArgs = hostBuilder;
+            })
+            .Build();
+
+            return hostBuilderWithArgs;
         }
 
         public HostBuilderContext GetHostBuilder()
